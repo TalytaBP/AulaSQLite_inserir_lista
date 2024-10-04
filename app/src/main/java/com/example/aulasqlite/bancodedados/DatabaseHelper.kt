@@ -1,5 +1,4 @@
 package com.example.aulasqlite.bancodedados
-
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -11,7 +10,6 @@ class DatabaseHelper(context:Context) : SQLiteOpenHelper(
     //2.Nome do banco de dados
     //3.CursorFactory
     //4.versão do banco de dados
-
     context,"loja",null,1
 ) {
     override fun onCreate(db: SQLiteDatabase?) {
@@ -29,11 +27,8 @@ class DatabaseHelper(context:Context) : SQLiteOpenHelper(
             e.printStackTrace()
             Log.i("db_info","Error ao criar tabela")
         }
-
     }
-
     override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
         //É executado quando há mudança de versão do banco
     }
-
 }

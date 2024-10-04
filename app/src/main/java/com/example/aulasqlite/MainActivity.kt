@@ -1,5 +1,4 @@
 package com.example.aulasqlite
-
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -9,18 +8,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.aulasqlite.bancodedados.DatabaseHelper
+import com.example.aulasqlite.bancodedados.ProdutoDAO
+import com.example.aulasqlite.model.Produto
 import java.lang.Exception
-
 class MainActivity : AppCompatActivity() {
-
     private val bancoDados by lazy{
         DatabaseHelper(this)
     }
-
     private lateinit var editNomeProduto:EditText
     private lateinit var btnSalvar:Button
     private lateinit var btnListar:Button
-
+    private lateinit var btnAtualizar:Button
+    private lateinit var btnDeletar:Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,11 +29,11 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         editNomeProduto = findViewById(R.id.editNomeProduto)
         btnSalvar = findViewById(R.id.btnSalvar)
         btnListar = findViewById(R.id.btnListar)
-
+        btnAtualizar = findViewById(R.id.btnAtualizar)
+        btnDeletar = findViewById(R.id.btnDeletar)
 
         btnSalvar.setOnClickListener{
             salvar()
@@ -44,22 +43,24 @@ class MainActivity : AppCompatActivity() {
             listar()
         }
 
+        btnAtualizar.setOnClickListener{
+            atualizar()
+        }
 
+        btnDeletar.setOnClickListener {
+            remover()
+        }
     }
-
     private fun salvar(){
         val nomeProduto = editNomeProduto.text.toString()
 
-        try{
-            val sql = "INSERT INTO produtos VALUES(null,'$nomeProduto','512gb')"
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("db_info","Produto salvo")
-        }catch (e:Exception){
-            e.printStackTrace()
-            Log.i("db_info","Erro ao salvar produto")
-        }
-    }
+        val produtoDAO = ProdutoDAO(this)
 
+        val produto = Produto(
+            -1, nomeProduto, "descrição..."
+        )
+        produtoDAO.salvar(produto)
+    }
     private fun listar(){
         val sql = "SELECT * FROM produtos"
         val cursor = bancoDados.readableDatabase.rawQuery(sql, null)
@@ -72,6 +73,26 @@ class MainActivity : AppCompatActivity() {
             Log.i("db_info","PRODUTOS: $idProduto - $titulo - $descricao")
         }
     }
+    private fun atualizar(){
+        val nomeProduto = editNomeProduto.text.toString()
+        val sql = "UPDATE produtos SET titulo = '$nomeProduto' WHERE id_produto=2;"
 
-
+        try{
+            bancoDados.writableDatabase.execSQL(sql)
+            Log.i("db_info", "Registro atualizado com sucesso")
+    }catch (e:Exception){
+        e.printStackTrace()
+        Log.i("db_info", "Error ao atualizar..")
+        }
+    }
+    private fun remover(){
+        val sql = "DELETE FROM produtos WHERE id_produto=1;"
+        try{
+            bancoDados.writableDatabase.execSQL(sql)
+            Log.i("db_info", "Produto removido com sucesso")
+        }catch (e:Exception){
+            e.printStackTrace()
+            Log.i("db_info", "Error ao excluir..")
+        }
+    }
 }
